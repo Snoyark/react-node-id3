@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('react-native-fs')
 const ID3Definitions = require("./src/ID3Definitions")
 const ID3Frames = require('./src/ID3Frames')
 const ID3Util = require('./src/ID3Util')
@@ -15,7 +15,7 @@ const zlib = require('zlib')
  * @param fn - (optional) Function for async version
  * @returns {boolean|Buffer|Error}
  */
-module.exports.write = function(tags, filebuffer, fn) {
+module.exports.write = async function(tags, filebuffer, fn) {
     let completeTag = this.create(tags)
     if(filebuffer instanceof Buffer) {
         filebuffer = this.removeTagsFromBuffer(filebuffer) || filebuffer
@@ -46,10 +46,10 @@ module.exports.write = function(tags, filebuffer, fn) {
         }
     } else {
         try {
-            let data = fs.readFileSync(filebuffer)
+            let data = await fs.readFile(filebuffer)
             data = this.removeTagsFromBuffer(data) || data
             let rewriteFile = Buffer.concat([completeTag, data])
-            fs.writeFileSync(filebuffer, rewriteFile, 'binary')
+            await fs.writeFile(filebuffer, rewriteFile, 'binary')
             return true
         } catch(err) {
             return err
@@ -159,14 +159,14 @@ module.exports.createBuffersFromTags = function(tags) {
  * @param fn - (optional) Function for async version
  * @returns {boolean}
  */
-module.exports.read = function(filebuffer, options, fn) {
+module.exports.read = async function(filebuffer, options, fn) {
     if(!options || typeof options === 'function') {
         fn = fn || options
         options = {}
     }
     if(!fn || typeof fn !== 'function') {
         if(typeof filebuffer === "string" || filebuffer instanceof String) {
-            filebuffer = fs.readFileSync(filebuffer)
+            filebuffer = await fs.readFile(filebuffer)
         }
         return this.getTagsFromBuffer(filebuffer, options)
     } else {
@@ -438,11 +438,11 @@ module.exports.removeTagsFromBuffer = function(data) {
  * @param fn - (optional) Function for async usage
  * @returns {boolean|Error}
  */
-module.exports.removeTags = function(filepath, fn) {
+module.exports.removeTags = async function(filepath, fn) {
     if(!fn || typeof fn !== 'function') {
         let data
         try {
-            data = fs.readFileSync(filepath)
+            data = await fs.readFile(filepath)
         } catch(e) {
             return e
         }
@@ -453,7 +453,7 @@ module.exports.removeTags = function(filepath, fn) {
         }
 
         try {
-            fs.writeFileSync(filepath, newData, 'binary')
+            await fs.writeFile(filepath, newData, 'binary')
         } catch(e) {
             return e
         }

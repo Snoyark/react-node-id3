@@ -1,5 +1,5 @@
 const nodeID3 = require('../index.js')
-const fs = require('fs')
+const fs = require('react-native-fs')
 
 
 //tags.image is the path to the image (only png/jpeg files allowed)
@@ -58,13 +58,13 @@ console.log(nodeID3.read("./example/test.mp3").chapter[0].tags)
   console.log(frame)
 })*/
 
-//let file = fs.readFileSync("./example/Kevin Penkin - Tomorrow.mp3")
+//let file = await fs.readFile("./example/Kevin Penkin - Tomorrow.mp3")
 /*nodeID3.update(tags, file, function(err, buffer) {
   console.log(err)
   console.log(buffer)
 })*/
 
-//fs.writeFileSync("./example/Kevin Penkin - Tomorrow.mp3", nodeID3.update(tags, file))
+//await fs.writeFile("./example/Kevin Penkin - Tomorrow.mp3", nodeID3.update(tags, file))
 
 //console.log(nodeID3.read("./example/example.mp3"))
 

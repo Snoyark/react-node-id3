@@ -39,7 +39,7 @@ module.exports.GENERIC_URL = {
 }
 
 module.exports.APIC = {
-    create: (data) => {
+    create: async (data) => {
         try {
             if (data instanceof Buffer) {
                 data = {
@@ -47,7 +47,7 @@ module.exports.APIC = {
                 }
             } else if (typeof data === 'string' || data instanceof String) {
                 data = {
-                    imageBuffer: fs.readFileSync(data)
+                    imageBuffer: await fs.readFile(data)
                 }
             } else if (!data.imageBuffer) {
                 return Buffer.alloc(0)

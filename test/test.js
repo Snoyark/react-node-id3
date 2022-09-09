@@ -4,7 +4,7 @@ const assert = require('assert')
 const chai = require('chai')
 const expect = chai.expect
 const iconv = require('iconv-lite')
-const fs = require('fs')
+const fs = require('react-native-fs')
 const ID3Util = require('../src/ID3Util')
 
 describe('NodeID3', function () {
@@ -125,7 +125,7 @@ describe('NodeID3', function () {
             ), 0)
         })
 
-        it('create APIC frame', function() {
+        it('create APIC frame', async function() {
             let tags = {
                 image: {
                     description: "asdf",
@@ -146,25 +146,25 @@ describe('NodeID3', function () {
                 }),
                 NodeID3.create({
                     image: {
-                        imageBuffer: fs.readFileSync(__dirname + '/smallimg')
+                        imageBuffer: await fs.readFile(__dirname + '/smallimg')
                     }
                 })
             ), 0)
 
             assert.strictEqual(Buffer.compare(
                 NodeID3.create({
-                    image: fs.readFileSync(__dirname + '/smallimg')
+                    image: await fs.readFile(__dirname + '/smallimg')
                 }),
                 NodeID3.create({
                     image: {
-                        imageBuffer: fs.readFileSync(__dirname + '/smallimg')
+                        imageBuffer: await fs.readFile(__dirname + '/smallimg')
                     }
                 })
             ), 0)
 
             // iTunes fix if description is empty
             assert.strictEqual(NodeID3.create({
-                image: fs.readFileSync(__dirname + '/smallimg')
+                image: await fs.readFile(__dirname + '/smallimg')
             })[20], 0x00)
         })
 
@@ -297,21 +297,21 @@ describe('NodeID3', function () {
         let tags = {title: "abc"}
         let filepath = './testfile.mp3'
 
-        it('sync write file without id3 tag', function() {
-            fs.writeFileSync(filepath, buffer, 'binary')
+        it('sync write file without id3 tag', async function() {
+            await fs.writeFile(filepath, buffer, 'binary')
             NodeID3.write(tags, filepath)
-            let newFileBuffer = fs.readFileSync(filepath)
-            fs.unlinkSync(filepath)
+            let newFileBuffer = await fs.readFile(filepath)
+            await fs.unlink(filepath)
             assert.strictEqual(Buffer.compare(
                 newFileBuffer,
                 Buffer.concat([NodeID3.create(tags), buffer])
             ), 0)
         })
-        it('async write file without id3 tag', function(done) {
-            fs.writeFileSync(filepath, buffer, 'binary')
-            NodeID3.write(tags, filepath, function() {
-                let newFileBuffer = fs.readFileSync(filepath)
-                fs.unlinkSync(filepath)
+        it('async write file without id3 tag', async function(done) {
+            await fs.writeFile(filepath, buffer, 'binary')
+            NodeID3.write(tags, filepath, async function() {
+                let newFileBuffer = await fs.readFile(filepath)
+                await fs.unlink(filepath)
                 if(Buffer.compare(
                     newFileBuffer,
                     Buffer.concat([NodeID3.create(tags), buffer])
@@ -326,21 +326,21 @@ describe('NodeID3', function () {
         let bufferWithTag = Buffer.concat([NodeID3.create(tags), buffer])
         tags = {album: "ix123"}
 
-        it('sync write file with id3 tag', function() {
-            fs.writeFileSync(filepath, bufferWithTag, 'binary')
+        it('sync write file with id3 tag', async function() {
+            await fs.writeFile(filepath, bufferWithTag, 'binary')
             NodeID3.write(tags, filepath)
-            let newFileBuffer = fs.readFileSync(filepath)
-            fs.unlinkSync(filepath)
+            let newFileBuffer = await fs.readFile(filepath)
+            await fs.unlink(filepath)
             assert.strictEqual(Buffer.compare(
                 newFileBuffer,
                 Buffer.concat([NodeID3.create(tags), buffer])
             ), 0)
         })
-        it('async write file with id3 tag', function(done) {
-            fs.writeFileSync(filepath, bufferWithTag, 'binary')
-            NodeID3.write(tags, filepath, function() {
-                let newFileBuffer = fs.readFileSync(filepath)
-                fs.unlinkSync(filepath)
+        it('async write file with id3 tag', async function(done) {
+            await fs.writeFile(filepath, bufferWithTag, 'binary')
+            NodeID3.write(tags, filepath, async function() {
+                let newFileBuffer = await fs.readFile(filepath)
+                await fs.unlinkSync(filepath)
                 if(Buffer.compare(
                     newFileBuffer,
                     Buffer.concat([NodeID3.create(tags), buffer])
